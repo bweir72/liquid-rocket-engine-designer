@@ -26,7 +26,7 @@ class CombustionState:
     """Snapshot of chamber combustion products at a given operating point."""
     tc_k: float          # chamber temperature, Kelvin
     cstar_ms: float      # characteristic velocity, m/s
-    gamma: float         # ratio of specific heats (dimensionless)
+    gamma: float         # ratio of specific heats (dimensionless), k in the book
     mw: float            # molecular weight of combustion gases, kg/kmol
     isp_ideal_s: float   # ideal vacuum-ish Isp from CEA, seconds
 
