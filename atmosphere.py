@@ -22,7 +22,6 @@ All quantities in SI:
 Reference: US Standard Atmosphere 1976, NASA/NOAA/USAF.
 Sutton Appendix 2 tabulates the same values.
 """
-
 import math
 from dataclasses import dataclass
 

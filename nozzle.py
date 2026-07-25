@@ -32,7 +32,7 @@ import math
 # Universal gas constant, J / (kmol * K)
 R_UNIVERSAL = 8314.462
 
-
+# ---------- data container ----------
 @dataclass
 class NozzleState:
     """Snapshot of nozzle exit conditions and performance at one operating point."""
@@ -146,13 +146,13 @@ class IsentropicNozzle:
         cf = thrust_n / (self.pc * area_throat_m2)  # dimensionless
 
         return NozzleState(
-            mach_e=mach_e,
-            pe_pa=pe_pa,
-            te_k=te_k,
-            ve_ms=ve_ms,
-            cf=cf,
-            mdot_kgs=mdot_kgs,
-            thrust_n=thrust_n,
+            mach_e = mach_e,
+            pe_pa = pe_pa,
+            te_k = te_k,
+            ve_ms = ve_ms,
+            cf = cf,
+            mdot_kgs = mdot_kgs,
+            thrust_n =  thrust_n,
         )
     
 

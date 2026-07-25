@@ -42,9 +42,6 @@ isps_s = []
 ambient_pressure_pa = []
 exit_pressure_pa = []
 
-print(f"Chamber: Tc={chamber.tc_k:.1f} K, c*={chamber.cstar_ms:.1f} m/s, gamma={chamber.gamma:.3f}")
-print(f"Sweeping {len(altitude_m)} altitudes...")
-
 for h in altitude_m:
     ambient_pa = pressure_at_altitude(h)
     state = nozzle.solve( area_throat_m2 = THROAT_AREA_M2, expansion_ratio = EXPANSION_RATIO,
