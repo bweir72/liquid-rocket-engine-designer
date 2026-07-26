@@ -43,6 +43,9 @@ class NozzleState:
     cf: float            # thrust coefficient (dimensionless)
     mdot_kgs: float      # mass flow rate, kg/s
     thrust_n: float      # thrust, N
+    tt_k: float          # throat temperature, K
+    pt_pa: float         # throat pressure, Pa
+    at_m2: float         # throat area, m^2 (echo of input)
     
 class IsentropicNozzle:
     """
@@ -120,6 +123,27 @@ class IsentropicNozzle:
         inner = 1.0 + 0.5 * (k - 1.0) * mach**2   # (1 + (k-1)/2 * M^2)
         ratio = 1.0 / inner                       # T/Tc
         return ratio
+
+    def expansion_ratio_for_matched_exit(self, ambient_pa: float) -> float:
+        """
+        Return the expansion ratio ε such that P_e = ambient_pa.
+        Approach:
+        1. Target pressure ratio: P_e/P_c = ambient_pa / self.pc
+        2. Solve for M_e where pressure_ratio(M_e) equals that target
+        3. Convert M_e to area ratio via area_ratio_from_mach(M_e)
+        """
+        if ambient_pa >= self.pc:
+            raise ValueError(f"Ambient pressure ({ambient_pa} Pa) must be less than chamber pressure ({self.pc} Pa)")
+        
+        target_pressure_ratio = ambient_pa / self.pc
+        # brentq finds the M where (pressure_ratio(M) - target_pressure_ratio) = 0        
+        def residual(m):
+            return self.pressure_ratio(m) - target_pressure_ratio
+        
+        mach_lower_bound = 1.0001   # just above sonic (supersonic branch)
+        mach_upper_bound = 50.0     # comfortably above any realistic exit Mach
+        mach_e = brentq(residual, mach_lower_bound, mach_upper_bound)
+        return self.area_ratio_from_mach(mach_e)
     
     # ---------- solver: geometry + chamber state → performance ----------
 
@@ -144,6 +168,8 @@ class IsentropicNozzle:
         area_exit_m2 = area_throat_m2 * expansion_ratio
         thrust_n = mdot_kgs * ve_ms + (pe_pa - ambient_pa) * area_exit_m2
         cf = thrust_n / (self.pc * area_throat_m2)  # dimensionless
+        tt_k = self.tc * self.temperature_ratio(1.0)
+        pt_pa = self.pc * self.pressure_ratio(1.0)
 
         return NozzleState(
             mach_e = mach_e,
@@ -153,6 +179,9 @@ class IsentropicNozzle:
             cf = cf,
             mdot_kgs = mdot_kgs,
             thrust_n =  thrust_n,
+            tt_k=tt_k,
+            pt_pa=pt_pa,
+            at_m2=area_throat_m2
         )
     
 
@@ -180,3 +209,11 @@ if __name__ == "__main__":
     print(f"  mdot   = {state.mdot_kgs*1000:.2f} g/s")
     print(f"  Cf     = {state.cf:.3f}")
     print(f"  Thrust = {state.thrust_n:.1f} N")
+    print(f"  T_t    = {state.tt_k:.1f} K")
+    print(f"  P_t    = {state.pt_pa/1000:.2f} kPa")
+    
+    eps_sl = nozzle.expansion_ratio_for_matched_exit(ambient_pa=101325)
+    eps_25km = nozzle.expansion_ratio_for_matched_exit(ambient_pa=2549)
+    print(f"\nMatched-exit expansion ratios:")
+    print(f"  Sea level (101.3 kPa): ε = {eps_sl:.2f}")
+    print(f"  25 km (2.5 kPa):       ε = {eps_25km:.2f}")
