@@ -56,6 +56,7 @@ for h in altitude_m:
 
 altitudes_km = np.array(altitude_m) / 1000.0
 
+#Graphing altitude vs thrust
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, thrusts_n)
 ax.set_xlabel("Altitude (km)")
@@ -65,6 +66,7 @@ ax.grid(True, alpha=0.3)
 fig.tight_layout()
 fig.savefig("plots/thrust_vs_altitude.png", dpi=150)
 
+#Graphing isp vs altitude
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, isps_s)
 ax.set_xlabel("Altitude (km)")
@@ -73,5 +75,18 @@ ax.set_title(f"Isp vs Altitude — LOX/Ethanol, Pc={PC_PA/1e5:.0f} bar, ε={EXPA
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
 fig.savefig("plots/isp_vs_altitude.png", dpi=150)
+
+#Graphing ambient/exit pressure vs altitude
+fig, ax = plt.subplots()
+ax.plot(altitudes_km, ambient_pressure_pa, label = "Ambient")
+ax.plot(altitudes_km, exit_pressure_pa, label = "Exit")
+ax.legend()
+ax.set_xlabel("Altitude (km)")
+ax.set_ylabel("Pressure (Pa)")
+ax.set_title("Exit and Ambient Pressure vs Altitude")
+ax.set_yscale("log")
+ax.grid(True, alpha=0.3)
+fig.tight_layout()
+fig.savefig("plots/pressure_vs_altitude.png", dpi=150)
 
 plt.show()
