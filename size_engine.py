@@ -43,6 +43,10 @@ class EngineDesign:
 
     tank_pressure_pa: float
 
+    tc_k: float          # chamber temperature, K
+    cstar_ms: float      # characteristic velocity, m/s
+    gamma: float         # ratio of specific heats
+
 
 def size_engine(
     thrust_target_n: float,
@@ -132,6 +136,9 @@ def size_engine(
         mdot_ox_kgs = mdot_ox_kgs,
         mdot_fuel_kgs = mdot_fuel_kgs,
         tank_pressure_pa = tank_pressure_pa,
+        tc_k=chamber.tc_k,
+        cstar_ms=chamber.cstar_ms,
+        gamma=chamber.gamma,
     )
 
 
