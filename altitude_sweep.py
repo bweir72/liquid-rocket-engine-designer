@@ -30,18 +30,23 @@ H_STEP_M = 500
 
 G0 = 9.80665              # standard gravity, m/s^2 (for Isp)
 
+# ---------- setup ----------
+# Build a Propellant, get the chamber CombustionState.
+# Build an IsentropicNozzle from that chamber state.
 prop = Propellant(ox = "LOX", fuel = "Ethanol")
 chamber = prop.get_combustion(pc_pa = PC_PA, of = OF_RATIO, eps = EXPANSION_RATIO)
-
 nozzle = IsentropicNozzle(gamma = chamber.gamma, mw = chamber.mw, tc_k = chamber.tc_k, pc_pa = PC_PA)
 
+# Altitude array: sea level to 30 km in 500 m steps.
 altitude_m = np.arange(H_MIN_M, H_MAX_M + H_STEP_M, H_STEP_M)
 
+# Collect results across the sweep. Kept as plain lists during the loop
 thrusts_n = []
 isps_s = []
 ambient_pressure_pa = []
 exit_pressure_pa = []
 
+# Main sweep
 for h in altitude_m:
     ambient_pa = pressure_at_altitude(h)
     state = nozzle.solve( area_throat_m2 = THROAT_AREA_M2, expansion_ratio = EXPANSION_RATIO,
@@ -53,10 +58,10 @@ for h in altitude_m:
     ambient_pressure_pa.append(ambient_pa)
     exit_pressure_pa.append(state.pe_pa)
 
-
+# Convert to km for x-axis readability.
 altitudes_km = np.array(altitude_m) / 1000.0
 
-#Graphing altitude vs thrust
+# Graphing altitude vs thrust
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, thrusts_n)
 ax.set_xlabel("Altitude (km)")

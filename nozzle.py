@@ -179,9 +179,9 @@ class IsentropicNozzle:
             cf = cf,
             mdot_kgs = mdot_kgs,
             thrust_n =  thrust_n,
-            tt_k=tt_k,
-            pt_pa=pt_pa,
-            at_m2=area_throat_m2
+            tt_k = tt_k,
+            pt_pa = pt_pa,
+            at_m2 = area_throat_m2
         )
     
 

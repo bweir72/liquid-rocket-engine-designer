@@ -72,21 +72,14 @@ def size_engine(
 
     # ---------- STEP 1: matched-exit expansion ratio ----------
     # Ask the nozzle for the ε that matches exit pressure to ambient.
-    # Store in `epsilon`.
 
     epsilon = nozzle.expansion_ratio_for_matched_exit(ambient_pa)
 
 
     # ---------- STEP 2: find throat area for target thrust ----------
-    # Define a residual function that takes a candidate throat area,
-    # runs nozzle.solve at that area with the ε from Step 1, and returns
-    # (actual_thrust - target_thrust).
-    #
-    # Use brentq with physically reasonable bounds (something like 1e-6 to 1e-2 m²)
-    # to find the throat area where residual = 0.
-    #
-    # Store the result in `area_throat_m2`.
-
+    # Define a residual function that takes a candidate throat area 
+    # that uses brentq to find the root where ther residual = 0
+    
     def thrust_residual(at_m2):         
         nozzle_state = nozzle.solve(area_throat_m2 = at_m2, expansion_ratio = epsilon, ambient_pa = ambient_pa, cstar_ms = chamber.cstar_ms)
         return nozzle_state.thrust_n - thrust_target_n
@@ -96,8 +89,6 @@ def size_engine(
     area_throat_m2 = brentq(thrust_residual, area_lower_bound, area_upper_bound)
 
     # ---------- STEP 3: re-run solve at the final geometry ----------
-    # Now that you have the correct throat area, run nozzle.solve once more
-    # to get the full final state (mdot, thrust, exit conditions, etc.).
 
     final_state = nozzle.solve(area_throat_m2 = area_throat_m2, expansion_ratio = epsilon, ambient_pa = ambient_pa, cstar_ms = chamber.cstar_ms)
 
@@ -126,21 +117,21 @@ def size_engine(
     # ---------- assemble and return ----------
 
     return EngineDesign(
-        thrust_target_n=thrust_target_n,
-        altitude_m=altitude_m,
-        pc_pa=pc_pa,
-        of_ratio=of_ratio,
-        area_throat_m2=area_throat_m2,
-        diameter_throat_m=diameter_throat_m,
-        area_exit_m2=area_exit_m2,
-        diameter_exit_m=diameter_exit_m,
-        expansion_ratio=epsilon,
-        thrust_actual_n=final_state.thrust_n,
-        isp_s=isp_s,
-        mdot_kgs=final_state.mdot_kgs,
-        mdot_ox_kgs=mdot_ox_kgs,
-        mdot_fuel_kgs=mdot_fuel_kgs,
-        tank_pressure_pa=tank_pressure_pa,
+        thrust_target_n = thrust_target_n,
+        altitude_m = altitude_m,
+        pc_pa = pc_pa,
+        of_ratio = of_ratio,
+        area_throat_m2 = area_throat_m2,
+        diameter_throat_m = diameter_throat_m,
+        area_exit_m2 = area_exit_m2,
+        diameter_exit_m = diameter_exit_m,
+        expansion_ratio = epsilon,
+        thrust_actual_n = final_state.thrust_n,
+        isp_s = isp_s,
+        mdot_kgs = final_state.mdot_kgs,
+        mdot_ox_kgs = mdot_ox_kgs,
+        mdot_fuel_kgs = mdot_fuel_kgs,
+        tank_pressure_pa = tank_pressure_pa,
     )
 
 
