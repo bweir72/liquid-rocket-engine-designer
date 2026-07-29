@@ -37,7 +37,7 @@ class Propellant:
     def __init__(self, ox: str = "LOX", fuel: str = "Ethanol"):
         self.ox = ox
         self.fuel = fuel
-        self._cea = CEA_Obj(oxName=ox, fuelName=fuel)
+        self._cea = CEA_Obj(oxName = ox, fuelName = fuel)
 
     def get_combustion(self, pc_pa: float, of: float, eps: float = 8.0) -> CombustionState:
         """
@@ -50,18 +50,18 @@ class Propellant:
         """
         pc_psia = pc_pa / PA_PER_PSI
 
-        tc_rankine = self._cea.get_Tcomb(Pc=pc_psia, MR=of)
-        cstar_fts = self._cea.get_Cstar(Pc=pc_psia, MR=of)
-        gamma = self._cea.get_Chamber_MolWt_gamma(Pc=pc_psia, MR=of, eps=eps)[1]
-        mw = self._cea.get_Chamber_MolWt_gamma(Pc=pc_psia, MR=of, eps=eps)[0]
-        isp = self._cea.get_Isp(Pc=pc_psia, MR=of, eps=eps)
+        tc_rankine = self._cea.get_Tcomb(Pc = pc_psia, MR = of)
+        cstar_fts = self._cea.get_Cstar(Pc = pc_psia, MR = of)
+        gamma = self._cea.get_Chamber_MolWt_gamma(Pc = pc_psia, MR = of, eps = eps)[1]
+        mw = self._cea.get_Chamber_MolWt_gamma(Pc = pc_psia, MR = of, eps = eps)[0]
+        isp = self._cea.get_Isp(Pc = pc_psia, MR = of, eps = eps)
 
         return CombustionState(
-            tc_k=tc_rankine * 5.0 / 9.0,
-            cstar_ms=cstar_fts / FT_PER_M,
-            gamma=gamma,
-            mw=mw,
-            isp_ideal_s=isp,
+            tc_k = tc_rankine * 5.0 / 9.0,
+            cstar_ms = cstar_fts / FT_PER_M,
+            gamma  = gamma,
+            mw = mw,
+            isp_ideal_s = isp,
         )
 
 

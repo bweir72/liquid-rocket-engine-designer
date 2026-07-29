@@ -49,8 +49,11 @@ exit_pressure_pa = []
 # Main sweep
 for h in altitude_m:
     ambient_pa = pressure_at_altitude(h)
-    state = nozzle.solve( area_throat_m2 = THROAT_AREA_M2, expansion_ratio = EXPANSION_RATIO,
-              ambient_pa = ambient_pa , cstar_ms = chamber.cstar_ms)
+    state = nozzle.solve(area_throat_m2 = THROAT_AREA_M2, 
+                         expansion_ratio = EXPANSION_RATIO,
+                         ambient_pa = ambient_pa ,
+                         cstar_ms = chamber.cstar_ms)
+    
     isp = state.thrust_n / (state.mdot_kgs * G0)
 
     thrusts_n.append(state.thrust_n)
@@ -61,7 +64,7 @@ for h in altitude_m:
 # Convert to km for x-axis readability.
 altitudes_km = np.array(altitude_m) / 1000.0
 
-# Graphing altitude vs thrust
+# Plotting altitude vs thrust
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, thrusts_n)
 ax.set_xlabel("Altitude (km)")
@@ -69,9 +72,9 @@ ax.set_ylabel("Thrust (N)")
 ax.set_title(f"Thrust vs Altitude — LOX/Ethanol, Pc={PC_PA/1e5:.0f} bar, ε={EXPANSION_RATIO:.0f}")
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
-fig.savefig("plots/thrust_vs_altitude.png", dpi=150)
+fig.savefig("plots/altitude_sweep/thrust_vs_altitude.png", dpi=150)
 
-#Graphing isp vs altitude
+# Plotting isp vs altitude
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, isps_s)
 ax.set_xlabel("Altitude (km)")
@@ -79,9 +82,9 @@ ax.set_ylabel("Specific Impulse (s)")
 ax.set_title(f"Isp vs Altitude — LOX/Ethanol, Pc={PC_PA/1e5:.0f} bar, ε={EXPANSION_RATIO:.0f}")
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
-fig.savefig("plots/isp_vs_altitude.png", dpi=150)
+fig.savefig("plots/altitude_sweep/isp_vs_altitude.png", dpi=150)
 
-#Graphing ambient/exit pressure vs altitude
+# Plotting ambient/exit pressure vs altitude
 fig, ax = plt.subplots()
 ax.plot(altitudes_km, ambient_pressure_pa, label = "Ambient")
 ax.plot(altitudes_km, exit_pressure_pa, label = "Exit")
@@ -92,6 +95,6 @@ ax.set_title("Exit and Ambient Pressure vs Altitude")
 ax.set_yscale("log")
 ax.grid(True, alpha=0.3)
 fig.tight_layout()
-fig.savefig("plots/pressure_vs_altitude.png", dpi=150)
+fig.savefig("plots/altitude_sweep/pressure_vs_altitude.png", dpi=150)
 
 plt.show()
