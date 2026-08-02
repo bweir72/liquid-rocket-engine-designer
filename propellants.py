@@ -15,10 +15,12 @@ from rocketcea.cea_obj import CEA_Obj
 
 # Unit conversions
 PA_PER_PSI = 6894.757
-FTS_PER_MS = 1.0 / 0.3048  # divide m/s by this to get ft/s; multiply ft/s by this... wait
-                            # actually: 1 m = 3.28084 ft, so 1 m/s = 3.28084 ft/s
-                            # so m/s = ft/s / 3.28084
+FTS_PER_MS = 1.0 / 0.3048 
 FT_PER_M = 3.28084
+BTU_TO_J = 1055.056          # 1 BTU = 1055 J
+LB_TO_KG = 0.453592          # 1 lb = 0.454 kg
+R_TO_K = 5.0 / 9.0           # 1 °R change = 5/9 K change
+MILLIPOISE_TO_KGMS = 1e-4    # 1 millipoise = 1e-4 Pa·s = 1e-4 kg/(m·s)
 
 
 @dataclass
@@ -29,6 +31,9 @@ class CombustionState:
     gamma: float         # ratio of specific heats (dimensionless), k in the book
     mw: float            # molecular weight of combustion gases, kg/kmol
     isp_ideal_s: float   # ideal vacuum-ish Isp from CEA, seconds
+    mu_kgms: float       # dynamic viscosity, kg/(m·s)  — a.k.a. Pa·s
+    cp_j_kg_k: float     # specific heat at constant pressure, J/(kg·K)
+    prandtl: float       # Prandtl number, dimensionless
 
 
 class Propellant:
@@ -55,6 +60,11 @@ class Propellant:
         gamma = self._cea.get_Chamber_MolWt_gamma(Pc = pc_psia, MR = of, eps = eps)[1]
         mw = self._cea.get_Chamber_MolWt_gamma(Pc = pc_psia, MR = of, eps = eps)[0]
         isp = self._cea.get_Isp(Pc = pc_psia, MR = of, eps = eps)
+        cp_btu_lb_r, mu_millipoise, _, prandtl = self._cea.get_Chamber_Transport(Pc = pc_psia, MR = of, eps = eps)
+
+        # Unit Conversion
+        cp_j_kg_k = cp_btu_lb_r * BTU_TO_J / LB_TO_KG / R_TO_K
+        mu_kgms = mu_millipoise * MILLIPOISE_TO_KGMS
 
         return CombustionState(
             tc_k = tc_rankine * 5.0 / 9.0,
@@ -62,6 +72,9 @@ class Propellant:
             gamma  = gamma,
             mw = mw,
             isp_ideal_s = isp,
+            mu_kgms = mu_kgms,
+            cp_j_kg_k = cp_j_kg_k,
+            prandtl = prandtl
         )
 
 
@@ -75,3 +88,6 @@ if __name__ == "__main__":
     print(f"  gamma  = {state.gamma:.3f}")
     print(f"  MW     = {state.mw:.2f} kg/kmol")
     print(f"  Isp    = {state.isp_ideal_s:.1f} s (ideal)")
+    print(f"  c_p    = {state.cp_j_kg_k:.1f} J/(kg·K)")
+    print(f"  mu     = {state.mu_kgms*1e6:.2f} μPa·s")
+    print(f"  Pr     = {state.prandtl:.3f}")

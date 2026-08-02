@@ -47,6 +47,10 @@ class EngineDesign:
     cstar_ms: float      # characteristic velocity, m/s
     gamma: float         # ratio of specific heats
 
+    mu_kgms: float
+    cp_j_kg_k: float
+    prandtl: float
+
 
 def size_engine(
     thrust_target_n: float,
@@ -139,6 +143,9 @@ def size_engine(
         tc_k = chamber.tc_k,
         cstar_ms = chamber.cstar_ms,
         gamma = chamber.gamma,
+        mu_kgms=chamber.mu_kgms,
+        cp_j_kg_k=chamber.cp_j_kg_k,
+        prandtl=chamber.prandtl,
     )
 
 
@@ -153,14 +160,14 @@ if __name__ == "__main__":
     )
 
     print(f"Engine sizing — {design.thrust_target_n:.0f} N target at {design.altitude_m/1000:.0f} km altitude:")
-    print(f"  ε              = {design.expansion_ratio:.2f}")
-    print(f"  A_t            = {design.area_throat_m2*1e6:.2f} mm²")
-    print(f"  D_t            = {design.diameter_throat_m*1000:.2f} mm")
-    print(f"  A_e            = {design.area_exit_m2*1e6:.2f} mm²")
-    print(f"  D_e            = {design.diameter_exit_m*1000:.2f} mm")
-    print(f"  Thrust (actual)= {design.thrust_actual_n:.1f} N")
-    print(f"  Isp            = {design.isp_s:.1f} s")
-    print(f"  mdot           = {design.mdot_kgs*1000:.1f} g/s")
-    print(f"    ox           = {design.mdot_ox_kgs*1000:.1f} g/s")
-    print(f"    fuel         = {design.mdot_fuel_kgs*1000:.1f} g/s")
-    print(f"  Tank pressure  = {design.tank_pressure_pa/1e5:.1f} bar")
+    print(f"  ε               = {design.expansion_ratio:.2f}")
+    print(f"  A_t             = {design.area_throat_m2*1e6:.2f} mm²")
+    print(f"  D_t             = {design.diameter_throat_m*1000:.2f} mm")
+    print(f"  A_e             = {design.area_exit_m2*1e6:.2f} mm²")
+    print(f"  D_e             = {design.diameter_exit_m*1000:.2f} mm")
+    print(f"  Thrust (actual) = {design.thrust_actual_n:.1f} N")
+    print(f"  Isp             = {design.isp_s:.1f} s")
+    print(f"  mdot            = {design.mdot_kgs*1000:.1f} g/s")
+    print(f"  ox              = {design.mdot_ox_kgs*1000:.1f} g/s")
+    print(f"  fuel            = {design.mdot_fuel_kgs*1000:.1f} g/s")
+    print(f"  Tank pressure   = {design.tank_pressure_pa/1e5:.1f} bar")

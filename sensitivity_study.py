@@ -15,6 +15,7 @@ final design choices in the report.
 import numpy as np
 import matplotlib.pyplot as plt
 from size_engine import size_engine
+from thermal import compute_throat_heat_flux
 
 def sweep_chamber_pressure():
     #---------- Fixed Parameters ---------- 
@@ -29,6 +30,7 @@ def sweep_chamber_pressure():
     diameter_throat_m = []
     isps_s = []
     tank_pressure_pa = []
+    heat_flux = []
 
     # Main sweep
     for pc in pc_range_pa:
@@ -41,6 +43,9 @@ def sweep_chamber_pressure():
         isps_s.append(engine.isp_s)
         tank_pressure_pa.append(engine.tank_pressure_pa)
 
+        throat_heat_flux = compute_throat_heat_flux(engine)
+        heat_flux.append(throat_heat_flux.q_wm2)
+
     # Converting pressure (pa) to bar
     pc_range_bar = pc_range_pa / 1e5
 
@@ -50,7 +55,10 @@ def sweep_chamber_pressure():
     # Converting tank pressure to bar
     tank_pressure_bar = np.array(tank_pressure_pa) / 1e5
 
-    # Plotting throat pressure vs throat diameter
+    # Convert heat flux from W/m² to MW/m² for readability
+    heat_flux_mw = np.array(heat_flux) / 1e6
+
+    # Plotting chamber pressure vs throat diameter
     fig, ax = plt.subplots()
     ax.plot(pc_range_bar, diameter_throat_mm)
     ax.set_xlabel("Chamber Pressure (bar)")
@@ -60,7 +68,7 @@ def sweep_chamber_pressure():
     fig.tight_layout()
     fig.savefig("plots/sensitivity_pc/throat_dia_vs_pc.png", dpi=150)
 
-    # Plotting throat pressure vs Specific Impulse
+    # Plotting chamber pressure vs Specific Impulse
     fig, ax = plt.subplots()
     ax.plot(pc_range_bar, isps_s)
     ax.set_xlabel("Chamber Pressure (bar)")
@@ -70,7 +78,7 @@ def sweep_chamber_pressure():
     fig.tight_layout()
     fig.savefig("plots/sensitivity_pc/isp_vs_pc.png", dpi=150)
 
-    # Plotting throat pressure vs Tank Pressure
+    # Plotting chamber pressure vs Tank Pressure
     fig, ax = plt.subplots()
     ax.plot(pc_range_bar, tank_pressure_bar)
     ax.set_xlabel("Chamber Pressure (bar)")
@@ -80,10 +88,20 @@ def sweep_chamber_pressure():
     fig.tight_layout()
     fig.savefig("plots/sensitivity_pc/tank_pressure_vs_pc.png", dpi=150)
 
+    # Plotting chamber pressure vs heat flux
+    fig, ax = plt.subplots()
+    ax.plot(pc_range_bar, heat_flux_mw)
+    ax.set_xlabel("Chamber Pressure (bar)")
+    ax.set_ylabel("Throat Heat Flux (MW/m²)")
+    ax.set_title("Chamber Pressure vs Throat Heat Flux")
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig("plots/sensitivity_pc/heat_flux_vs_pc.png", dpi=150)
+
 
 
 def sweep_of_ratio():
-#---------- Fixed Parameters ---------- 
+    #---------- Fixed Parameters ---------- 
     thrust_target_n = 1000
     altitude_m = 0
     pc_pa = 20e5        # Fixed at 20 bar because it was the sweet spot in chamber pressure sweep
@@ -141,7 +159,7 @@ def sweep_of_ratio():
     fig.savefig("plots/sensitivity_of/tc_vs_of.png", dpi=150)
 
 def sweep_altitude():
-#---------- Fixed Parameters ---------- 
+    #---------- Fixed Parameters ---------- 
     thrust_target_n = 1000
     of_ratio = 1.5
     pc_pa = 20e5        # Fixed at 20 bar because it was the sweet spot in chamber pressure sweep
@@ -152,7 +170,7 @@ def sweep_altitude():
     # ---------- Setup ----------
     diameter_exit_m = []
     isps_s = []
-    expansion_ratio = []
+    expansion_ratios = []
 
     # Main sweep
     for h in altitude_range_m:
@@ -163,7 +181,7 @@ def sweep_altitude():
         )
         diameter_exit_m.append(engine.diameter_exit_m)
         isps_s.append(engine.isp_s)
-        expansion_ratio.append(engine.expansion_ratio)
+        expansion_ratios.append(engine.expansion_ratio)
 
     # Converting diamter to mm 
     diameter_exit_mm = np.array(diameter_exit_m) * 1000
@@ -193,7 +211,7 @@ def sweep_altitude():
 
     # Plotting altitude vs expansion ratio
     fig, ax = plt.subplots()
-    ax.plot(altitude_range_km, expansion_ratio)
+    ax.plot(altitude_range_km, expansion_ratios)
     ax.set_xlabel("Altitude (km)")
     ax.set_ylabel("Expansion Ratio")
     ax.set_title("Altitude vs Expansion Ratio")
